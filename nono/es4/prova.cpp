@@ -28,7 +28,7 @@ TGraph stdev;
  TCanvas can2("Uniforme","Uniforme") ;
    int n_max=100000; 
   double pimez=(M_PI/2);
-  hitmis coso(1);
+  IntegratoreMedia coso(1);
     vector<TH1F> vhistos;
     vector<double> devst;
   int m=100;
