@@ -26,39 +26,40 @@ TGraph stdev;
  seno f(1,1);
  vector<int> cases;
  TCanvas can2("Uniforme","Uniforme") ;
-   int n_max=100000; 
+   int n_max=10000; 
   double pimez=(M_PI/2);
-  IntegratoreMedia coso(1);
-    vector<TH1F> vhistos;
+  hitmis coso(1);
+    vector<TH1F*> vhistos;
     vector<double> devst;
   int m=100;
   for(int k=0;k<6;k++){
     double app =0;
-    if((k+1)%2){app=m*2;}else{app=m*5;};
+    if((k+1)%2){app=m*5;}else{app=m*2;};
     cases.push_back(app);
     m=app;
     };
 
 
-  #pragma omp parallel for
+  // #pragma omp parallel for
   for ( int k = 0 ; k < cases.size() ; k++ ) {     // ciclo sui casi da studiare
 
-    TH1F h("distribuzione","distribuzione",100,0.8,1.2) ;                   // costruzione istogramma 
+    string nomehisto = "h"+to_string(k);
+    cout << "Integro con punti = " << cases[k] << endl;
+    TH1F * h = new TH1F(nomehisto.c_str(),nomehisto.c_str(),100,0.8,1.2) ;                   // costruzione istogramma 
     vector<double> vettoreapp;
  
-
-      for ( int j = 0 ; j < n_max ; j++ ){ 
-        double appoggio=coso.Integra(f,0,pimez,cases[k],0.5);
+    for ( int j = 0 ; j < n_max ; j++ ){ 
+      double appoggio=coso.Integra(f,0,pimez,cases[k],0.5);
         
-        h.Fill((appoggio)) ; // riempimento istogramma
+      h->Fill((appoggio)) ; // riempimento istogramma
 
-        vettoreapp.push_back(appoggio);
-  };
-  #pragma omp critical
-     devst.push_back(varianza_v<double>(vettoreapp));    //calcolo dev st e metti in un vector
+      vettoreapp.push_back(appoggio);
+    };
   
-        vhistos.push_back(h);                          // conserviamo i puntatori
-        cout<< "finito il giro n=" <<(k+1) <<" su 6"<<endl;
+    devst.push_back(varianza_v<double>(vettoreapp));    //calcolo dev st e metti in un vector
+  
+    vhistos.push_back(h);                          // conserviamo i puntatori
+    cout<< "finito il giro n=" <<(k+1) <<" su 6"<<endl;
   };
 
 
@@ -70,9 +71,9 @@ TGraph stdev;
    for ( int k = 0 ; k < cases.size() ; k++ ) { 
       can2.cd(k+1);
       string filename = "x [AU] deviazione st calcolata =" +convert(devst[k]) ;
-      vhistos[k].GetXaxis()->SetTitle(filename.c_str());
-      vhistos[k].GetYaxis()->SetTitle("N");
-      vhistos[k].Draw();
+      vhistos[k]->GetXaxis()->SetTitle(filename.c_str());
+      vhistos[k]->GetYaxis()->SetTitle("N");
+      vhistos[k]->Draw();
      
     
 
