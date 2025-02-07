@@ -156,5 +156,5 @@ class fratta :public Funzione{
     double val(double x) const override {
         return (1./sqrt(4-(x*x)));
     }
-}
+};
 #endif // __FUNZIONI__
