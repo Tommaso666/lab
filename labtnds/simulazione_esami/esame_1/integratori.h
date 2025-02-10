@@ -164,7 +164,7 @@ class trapezi : public integratore {
         for (int i = 1; i < passi; ++i) {
             somma += f.val(a + i * h);
         }
-        seterr(h * h);
+        // seterr(h * h);
         return somma * h;
     }
 

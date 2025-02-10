@@ -39,7 +39,7 @@ void regressione_lineare(vector<double> log_h, vector<double> log_err, double &k
 int main(){
     
     // variabili principali 
-    const double valore_vero=(3./16.)*(M_E*M_E);
+    double valore_vero=(3./16.)*(M_E*M_E);
     Xcubo funzione;
     vector<double> errori_punto2;
     vector<double> passo;
@@ -62,12 +62,16 @@ int main(){
         TGraph errore;
         int punto_numero=0;
         do{
+            double passo1 =(b-a)/passi_iniziali;
             double appogio =0 ;
-            appogio=fabs(fabs(Middlepoint.integrale(funzione , a , b , passi_iniziali))-valore_vero);
-            errore.SetPoint(punto_numero, passi_iniziali , appogio);
+            double appoggio = Middlepoint.integrale(funzione , a , b , passi_iniziali);
+            appogio=fabs(fabs(appoggio)-valore_vero);
+            errore.SetPoint(punto_numero, passo1 , appogio);
             errori_punto2.push_back(log(appogio));
-            passo.push_back(log((b-a)/passi_iniziali));
+            passo.push_back(log(passo1));
             punto_numero++;
+            
+            cout<<"il valore del integrale è "<< appoggio <<" con un numero di passi paro a "<<passi_iniziali <<" con un passo di integegrazione di "<< passo1 <<" ed un errore di "<<appogio <<endl;
             passi_iniziali*=2;
         } while (passi_iniziali<1028);
         // rendiamo bello il grafico
@@ -97,11 +101,14 @@ int main(){
         c1.SetLogx();
         TGraph errore1;
         punto_numero=0;
-        do{
+        do{ 
+            double passo1 =(b-a)/passi_iniziali;
             double appogio =0 ;
-            appogio=fabs(fabs(point3.integrale(funzione , a , b , passi_iniziali))-valore_vero);
-            errore1.SetPoint(punto_numero, passi_iniziali , appogio);
+            double appoggio = point3.integrale(funzione , a , b , passi_iniziali);
+            appogio=fabs(fabs(appoggio)-valore_vero);
+            errore1.SetPoint(punto_numero, passo1 , appogio);
             punto4.push_back(log(appogio));
+            cout<<"il valore del integrale con middleright è "<< appoggio <<" con un numero di passi paro a "<<passi_iniziali <<" con un passo di integegrazione di "<< passo1 <<" ed un errore di "<<appogio <<endl;
             punto_numero++;
             passi_iniziali*=2;
         } while (passi_iniziali<1028);
@@ -124,72 +131,57 @@ int main(){
         vector<double> valori_calcolati;
         IntegratoreMedia popolo_di_roma(4);
         double accumulatoreseriale = 0;
-        unsigned int max = 1000;
+        unsigned int max = 1000,
+                    n_punti=16;
         for(int i =0;i<(max+1);i++){
-            double appoggio = popolo_di_roma.Integra(funzione,a,b,16,1);
+            double appoggio = popolo_di_roma.Integra(funzione,a,b,n_punti,1);
             accumulatoreseriale += appoggio;
             valori_calcolati.push_back(appoggio);
         };
         double valore_integrale =accumulatoreseriale/max;
         double errore_statistico =deviazione_std(valori_calcolati);
+        cout <<"il valore dell'integrale è "<<valore_integrale<< " con un errore di "<<errore_statistico <<endl;
 
     //punto 6
+        double k=errore_statistico*sqrt(n_punti);
         double errore_appoggio = fabs(fabs(Middlepoint.integrale(funzione , a , b , 16 ))-valore_vero);
-        double errore_statistico2=0;
-        // vector<double> valori_calcolati1;
-        max=0;
-        accumulatoreseriale=0;
-        double accumulatoreseriale2 = 0;
-        do{
-            max++;
-            // for(int i =0;i<(max+1);i++){
-            double appoggio = popolo_di_roma.Integra(funzione,a,b,16,1);
-            accumulatoreseriale += appoggio;
-            accumulatoreseriale2 += appoggio*appoggio;
-            // valori_calcolati1.push_back(appoggio);
-            // }
-            double valore_integrale = accumulatoreseriale/max;
-            // double errore_statistico1 =deviazione_std(valori_calcolati1);
-            // errore_statistico2=errore_statistico1;
-            errore_statistico2 =  accumulatoreseriale2/max - valore_integrale*valore_integrale;
-        }while(errore_statistico2> errore_appoggio );
-
+        cout<<"punto ad un errore di "<<errore_appoggio<<endl;
+        max= (k*k)/(errore_appoggio*errore_appoggio);
+        cout<<"ho avuto bisogno di "<<max<<" passaggi"<<endl;
     // punto 7
+        
         fratta fine_esame;
-        b = 2;
+        vector<double> passi_7;
+        b = 2.;
         vector <double> punto7;
-        double valore_integrale_fratta_middlepoint =fabs(fabs(Middlepoint.integrale(funzione , a , b , 16 ))-valore_vero);
-        double valore_integrale_fratta_middleright =fabs(fabs(point3.integrale(funzione , a , b , 16 ))-valore_vero);
-        if(valore_integrale_fratta_middlepoint > valore_integrale_fratta_middleright ){
-            cout<<"preferisco middleright"<< endl;
+        //non avendo un valore vero ne creo uno con un  altro metodo 
+        valore_vero = M_PI/2;
+            cout<<"preferisco middlepoint siccome midleright darebbe inf"<< endl;
             passi_iniziali=2;
             punto_numero=0;
             do{
+                double passo2 =(b-a)/passi_iniziali;
                 double appogio =0 ;
-                appogio=fabs(fabs(point3.integrale(funzione , a , b , passi_iniziali))-valore_vero);
+                double appoggio=fabs(Middlepoint.integrale(fine_esame , a , b , passi_iniziali));
+                appogio=fabs(appoggio-valore_vero);
                 errore.SetPoint(punto_numero, passi_iniziali , appogio);
                 punto7.push_back(log(appogio));
+                cout<<"il valore del integrale è "<< appoggio <<" con un numero di passi paro a "<<passi_iniziali <<" con un passo di integegrazione di "<< passo2 <<" ed un errore di "<<appogio <<endl;
+            
                 punto_numero++;
                 passi_iniziali*=2;
+                passi_7.push_back(log(passo2));
             } while (passi_iniziali<1028);
 
-        }else{
-            cout<<"preferisco middleright"<< endl;
-            passi_iniziali=2;
-            punto_numero=0;
-            do{
-                double appogio =0 ;
-                appogio=fabs(fabs(point3.integrale(funzione , a , b , passi_iniziali))-valore_vero);
-                errore.SetPoint(punto_numero, passi_iniziali , appogio);
-                punto7.push_back(log(appogio));
-                punto_numero++;
-                passi_iniziali*=2;
-            } while (passi_iniziali<1028);
+        
+        double k1_2 =0 , k2_2 = 0;
+        regressione_lineare(passi_7,punto7,k1_2,k2_2);
 
-        }
-
+        cout << "\nStima dei coefficienti:" << endl;
+        cout << "k1 = " << k1_2 << endl;
+        cout << "k2 = " << k2_2 << endl;
     
-   cout<<"funziono"<<endl;
+    //cout<<"funziono"<<endl;
     // controllo della creazione die tutte le vari classi
 
 
