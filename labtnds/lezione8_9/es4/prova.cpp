@@ -26,14 +26,16 @@ int p=0;
   double omega =10.;
   
 for(int doppio=0;doppio<2;doppio++){
+  TGraph myGraph ;
   OscillatoreArmonicoforz osc(10.,alpha,omega);
   double tmax = (1./alpha)*((doppio*10)+1);
+  vector<double> x {0.,1.} ;
   double h =0.0001;   
 
-  vector<double> x {0.,1.} ;
+ 
   double t = 0.; 
 
-TGraph myGraph ;
+
  
   int nstep = int(tmax/h+0.5);
 

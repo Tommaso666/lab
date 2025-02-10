@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <omp.h>
 // librerie di root
+
 #include "TApplication.h"
 #include "TAxis.h"
 #include "TCanvas.h"
@@ -36,6 +37,7 @@ void regressione_lineare(vector<double> log_h, vector<double> log_err, double &k
 };
 
 int main(){
+    
     // variabili principali 
     const double valore_vero=(3./16.)*(M_E*M_E);
     Xcubo funzione;
@@ -48,7 +50,7 @@ int main(){
     // punto uno
 
         unsigned int passi_iniziali = 2;
-        MiddlePoint middlepoint;
+        middlepoint Middlepoint ;
     
         // root mio caro
         TCanvas c("errore trend", "errore trend");
@@ -58,10 +60,10 @@ int main(){
         c.SetLogy();
         c.SetLogx();
         TGraph errore;
-        int punto_numero=0
+        int punto_numero=0;
         do{
             double appogio =0 ;
-            appogio=fabs(fabs(middlepoint.integrale(funzione , a , b , passi_iniziali))-valore_vero);
+            appogio=fabs(fabs(Middlepoint.integrale(funzione , a , b , passi_iniziali))-valore_vero);
             errore.SetPoint(punto_numero, passi_iniziali , appogio);
             errori_punto2.push_back(log(appogio));
             passo.push_back(log((b-a)/passi_iniziali));
@@ -70,7 +72,7 @@ int main(){
         } while (passi_iniziali<1028);
         // rendiamo bello il grafico
         errore.SetMarkerStyle(20);  // Imposta lo stile dei marker
-        errore.markersize(0.3)
+        // errore.GetMarkerSize(0.3);
         errore.SetTitle("Andamento dell'Errore;numero di passi; Errore");
         errore.Draw("AP");          // Disegna con punti e assi
         c.SaveAs("errore.pdf");
@@ -84,7 +86,7 @@ int main(){
         
 
     // punto 3
-        Middleright point3;
+        middleright point3 ;
         passi_iniziali=2;
         // root mio caro
         TCanvas c1("errore trend", "errore trend");
@@ -94,7 +96,7 @@ int main(){
         c1.SetLogy();
         c1.SetLogx();
         TGraph errore1;
-        punto_numero=0
+        punto_numero=0;
         do{
             double appogio =0 ;
             appogio=fabs(fabs(point3.integrale(funzione , a , b , passi_iniziali))-valore_vero);
@@ -105,7 +107,7 @@ int main(){
         } while (passi_iniziali<1028);
         // rendiamo bello il grafico
         errore1.SetMarkerStyle(20);  // Imposta lo stile dei marker
-        errore1.markersize(0.3)
+        // errore1.GetMarkerSize(0.3);
         errore1.SetTitle("Andamento dell'Errore ; numero di passi ; Errore");
         errore1.Draw("AP");          // Disegna con punti e assi
         c1.SaveAs("errore_middleright.pdf");
@@ -126,13 +128,13 @@ int main(){
         for(int i =0;i<(max+1);i++){
             double appoggio = popolo_di_roma.Integra(funzione,a,b,16,1);
             accumulatoreseriale += appoggio;
-            valori_calcolati.push_back(appoggio)
-        }
+            valori_calcolati.push_back(appoggio);
+        };
         double valore_integrale =accumulatoreseriale/max;
         double errore_statistico =deviazione_std(valori_calcolati);
 
     //punto 6
-        double errore_appoggio = fabs(fabs(middlepoint.integrale(funzione , a , b , 16 ))-valore_vero);
+        double errore_appoggio = fabs(fabs(Middlepoint.integrale(funzione , a , b , 16 ))-valore_vero);
         double errore_statistico2=0;
         // vector<double> valori_calcolati1;
         max=0;
@@ -150,13 +152,13 @@ int main(){
             // double errore_statistico1 =deviazione_std(valori_calcolati1);
             // errore_statistico2=errore_statistico1;
             errore_statistico2 =  accumulatoreseriale2/max - valore_integrale*valore_integrale;
-        }while(errore_statistico2> errore_appoggio )
+        }while(errore_statistico2> errore_appoggio );
 
     // punto 7
-        fratta fine_esame();
+        fratta fine_esame;
         b = 2;
         vector <double> punto7;
-        double valore_integrale_fratta_middlepoint =fabs(fabs(middlepoint.integrale(funzione , a , b , 16 ))-valore_vero);
+        double valore_integrale_fratta_middlepoint =fabs(fabs(Middlepoint.integrale(funzione , a , b , 16 ))-valore_vero);
         double valore_integrale_fratta_middleright =fabs(fabs(point3.integrale(funzione , a , b , 16 ))-valore_vero);
         if(valore_integrale_fratta_middlepoint > valore_integrale_fratta_middleright ){
             cout<<"preferisco middleright"<< endl;
@@ -177,7 +179,7 @@ int main(){
             punto_numero=0;
             do{
                 double appogio =0 ;
-                appogio=fabs(fabs(middlepoint.integrale(funzione , a , b , passi_iniziali))-valore_vero);
+                appogio=fabs(fabs(point3.integrale(funzione , a , b , passi_iniziali))-valore_vero);
                 errore.SetPoint(punto_numero, passi_iniziali , appogio);
                 punto7.push_back(log(appogio));
                 punto_numero++;
@@ -186,7 +188,9 @@ int main(){
 
         }
 
-
+    
+   cout<<"funziono"<<endl;
+    // controllo della creazione die tutte le vari classi
 
 
 

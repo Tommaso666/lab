@@ -23,7 +23,7 @@ class seno :public funzione{
     public:
     seno():m_an(0),m_a(1){};
     seno(double an):m_an(0) ,m_a(an){};
-    virtual double val(an){return}
+    virtual double val(double an){return};
     private:
     double m_an,m_a;
 }:

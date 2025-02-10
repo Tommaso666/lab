@@ -108,7 +108,7 @@ public:
 };
 class OscillatoreArmonicoforz : public FunzioneVettorialeBase {
 public:
-  OscillatoreArmonicoforz(double omega0,double alpha,double omega) {  m_omega0 = omega0; m_alpha=alpha; m_omega=omega; } ;
+  OscillatoreArmonicoforz(double omega0/* pulsazione propria*/,double alpha/*smorzamento*/,double omega/*forzantes*/) {  m_omega0 = omega0; m_alpha=alpha; m_omega=omega; } ;
 
   virtual vector<double> Eval(double t, const vector<double> & x) const {
   double app = x[1];
@@ -119,9 +119,9 @@ public:
   };
 
  private:
-  double m_omega0;  
-  double m_alpha;
-  double m_omega;
+  double m_omega0;  //pulsazione propria
+  double m_alpha;   //smorzante
+  double m_omega;   //forzante
 };
 class pendol0 :public FunzioneVettorialeBase{
   public:
@@ -140,4 +140,21 @@ class pendol0 :public FunzioneVettorialeBase{
 
 };
 
+//funzioni non std per simulazioni di esame
+class Xcubo :public Funzione {
+    public:
+    Xcubo(){};
+    double val(double x) const override {
+        double risultato = (x*x*x)*log(sqrt(M_E+(x*x)));
+        return risultato;
+    }
+
+};
+class fratta :public Funzione{
+    public:
+    fratta(){};
+    double val(double x) const override {
+        return (1./sqrt(4-(x*x)));
+    }
+};
 #endif // __FUNZIONI__
