@@ -181,7 +181,7 @@ int main(){
         cout << "k1 = " << k1_2 << endl;
         cout << "k2 = " << k2_2 << endl;
     
-    //cout<<"funziono"<<endl;
+    cout<<"funziono"<<endl;
     // controllo della creazione die tutte le vari classi
 
 

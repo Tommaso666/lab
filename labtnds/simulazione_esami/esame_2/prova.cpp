@@ -49,11 +49,11 @@ int main(){
            velocità_iniziale =0.;
     inizio.push_back(ampieza_iniziale);   //condizione iniziale per la posizione
     inizio.push_back(velocità_iniziale);   //condizione iniziale per la velocità   
-    inizio1=inizio;
+    // inizio1=inizio;
 //punto 1
     double  tempo = 0. ,
             tempo_max = 43. ,
-            passo = 0.01;
+            passo = 0.1;
     unsigned int nstep = int(tempo_max/passo+0.5);
     //modulo evoluzione del sistema 
     double app2=0;
@@ -64,32 +64,45 @@ int main(){
     };
     cout << "la posizione del nostro oscillatore armonico è :" << inizio[0] << " e la sua velocità nel punto è pari a "<< inizio[1] <<endl;
 //punto 2
-    double errore_commesso = inizio[0] - ampieza_iniziale*sin(omega*tempo_max)*exp((tempo_max/tempo_max));
+    double omega_d = sqrt(omega*omega - pow(alpha/2.0, 2));
+    double x_analitico = exp(-alpha*tempo_max/2) * ( cos(omega_d*tempo_max) + (alpha/(2*omega_d))*sin(omega_d*tempo_max) );
+
+    double errore_commesso = fabs(inizio[0] - x_analitico);
     cout<< "l'errore commesso è pari a "<<errore_commesso <<endl;
 //punto 3
     double errore_cercato=0.000050;
-    double c= errore_commesso/pow(2*passo,4); 
-    passo=pow(50e-6/c,0.25); 
+    double c= errore_commesso/pow(passo,4); 
+    passo=pow(errore_cercato/c,0.25); 
     cout << "Il passo necessario per una precisione di 50e-6 metri è " << passo << endl;
 //punto 4
-    double  tempo = 0. ,
-            tempo_max = 43. ,
-            passo = 0.01;
-    unsigned int nstep = int(tempo_max/passo+0.5);
+        tempo = 0. ,
+        tempo_max = 43. ;
+        nstep = int(tempo_max/passo+0.5);
+        cout<< "farò questo numero di passi per ogni calcolo " <<nstep<<endl;
     randomGen mygen(4);
     double b =0.003;
     vector<double> errori_con_v;
+    int controllo2 = 0;
     for(int i = 0;i<10001;i++){
+        controllo2++;
+        tempo = 0. ;
         inizio[0]=1;  
         inizio[1] = mygen.gauss(-b,b); 
     //modulo evoluzione del sistema 
         double app2=0;
+        int controllo=1;
         for (int step=0; step<nstep; step++) {
             inizio = differenziatore.Passo(tempo,inizio,passo,oscilla);
             app2=inizio[0]; 
             tempo = tempo + passo;
+        //  controllo il funzionamanto 
+            // if((step % 100)==0){
+            //     cout<< "sono alla centinaia numeo "<< controllo <<" del loop numero "<<controllo2 <<endl;
+            //     controllo++;
+            // }
         };
-        errori_con_v.push_back(abs(inizio[0] - ampieza_iniziale*sin(omega*tempo_max)*exp((tempo_max/tempo_max))));
+        x_analitico = ampieza_iniziale * sin(omega * tempo_max) * exp(-alpha * tempo_max);
+        errori_con_v.push_back(fabs(inizio[0] - x_analitico));
     };
     double errore_statistico = deviazione_std(errori_con_v);
     cout<<"l'errore totale calcolato è "<< errore_statistico <<endl;
@@ -99,27 +112,43 @@ int main(){
     mmincert.push_back(0.008);
     mmincert.push_back(0.012);
     mmincert.push_back(0.015);
+    cout<<"sono al ultimo punto "<<endl;
 //punto 5
 vector<double> errori_in_v;
 errori_in_v.push_back(errore_statistico);
-    for(int p=0;p<5;p++){
-        for(int i = 0;i<10001;i++){
+    for(int p=1;p<5;p++){
+    for(int i = 0;i<10001;i++){
+        controllo2++;
+            tempo=0.;
             inizio[0]=1;  
-            inizio[1] = mygen.gauss(-mmincert[p+1],mmincert[p+1]); 
-            vector<double> errori_con_v1;
-        //modulo evoluzione del sistema 
-            double app2=0;
-            for (int step=0; step<nstep; step++) {
-                inizio = differenziatore.Passo(tempo,inizio,passo,oscilla);
-                app2=inizio[0]; 
-                tempo = tempo + passo;
-            };
-        errori_con_v1.push_back(abs(inizio[0] - ampieza_iniziale*sin(omega*tempo_max)*exp((tempo_max/tempo_max))));
+            inizio[1] = mygen.gauss(-mmincert[p],mmincert[p]); 
+    //modulo evoluzione del sistema 
+        double app2=0;
+        int controllo=1;
+        for (int step=0; step<nstep; step++) {
+            inizio = differenziatore.Passo(tempo,inizio,passo,oscilla);
+            app2=inizio[0]; 
+            tempo = tempo + passo;
+        //  controllo il funzionamanto 
+            // if((step % 100)==0){
+            //     cout<< "sono alla centinaia numeo "<< controllo <<" del loop numero "<<controllo2 <<endl;
+            //     controllo++;
+            // }
         };
-    errori_in_v.push_back(deviazione_std(errori_con_v));
+        x_analitico = ampieza_iniziale * sin(omega * tempo_max) * exp(-alpha * tempo_max);
+        errori_con_v.push_back(fabs(inizio[0] - x_analitico));
     };
+    
+        errore_statistico = deviazione_std(errori_con_v);
+        errori_in_v.push_back(errore_statistico);
+        cout<<"sono al loop "<<p+1<<"/5"<<endl;
     
 
 
 
-}
+    };
+    for(int i=0;i<errori_in_v.size();i++){
+        cout<< "con un errore sulla velocità di "<<mmincert[i]<<" ho un errore statistico di "<<errori_in_v[i]<<endl;
+    }
+return 0;
+};

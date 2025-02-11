@@ -104,7 +104,22 @@ class middlepoint : public integratore {
         return calcinx;
     };
     double integraleErr(const Funzione& f, double a, double b, double err) override {
-    return integrale(f, a, b, 100);  // Esegue l'integrale con 100 passi arbitrari
+      unsigned int passi = 2;
+      double errore = 1e9, risultatoPrecedente = integrale(f, a, b, passi);
+      int iterazioni = 0;
+      do {
+          passi *= 2;
+          double risultato = integrale(f, a, b, passi);
+          errore = (4./3.)*abs(risultato - risultatoPrecedente);
+          risultatoPrecedente = risultato;
+          iterazioni++;
+          if (iterazioni > 20) break;
+      } while (errore > err);
+      //superfluo ma se otteniamo un risultato migliore dell'atteso di molto sarebbe interessante saperlo
+      seterr(errore);
+      std::cout << "Iterazioni: " << iterazioni << std::endl;
+      return risultatoPrecedente;
+
 }
 
 };
@@ -152,7 +167,21 @@ class simson : public integratore {
         return calcinx;
     };
     double integraleErr(const Funzione& f, double a, double b, double err) override {
-    return integrale(f, a, b, 100);  // Esegue l'integrale con 100 passi arbitrari
+      unsigned int passi = 2;
+      double errore = 1e9, risultatoPrecedente = integrale(f, a, b, passi);
+      int iterazioni = 0;
+      do {
+          passi *= 2;
+          double risultato = integrale(f, a, b, passi);
+          errore = (15./16.)*abs(risultato - risultatoPrecedente);
+          risultatoPrecedente = risultato;
+          iterazioni++;
+          if (iterazioni > 20) break;
+      } while (errore > err);
+      //superfluo ma se otteniamo un risultato migliore dell'atteso di molto sarebbe interessante saperlo
+      seterr(errore);
+      std::cout << "Iterazioni: " << iterazioni << std::endl;
+      return risultatoPrecedente;
 }
 
 };
