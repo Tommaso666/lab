@@ -40,108 +40,43 @@ void regressione_lineare(vector<double> log_h, vector<double> log_err, double &k
 
 int main() {
     // Parametri
-    capacitor a(4);
-    vector<double> capacity_simulated;
-    for(int i =0;i<10000;i++){
-        a.esegui();
-        capacity_simulated.push_back(a.getCapacity_simulated());
-    };
-    double error_compound=deviazione_std(capacity_simulated);
-    double error_percent=(error_compound/a.getCapacity());
-    cout<<"con un errore pari al " <<error_compound<<"F il valore del errore percentuale è "<<error_percent*100<<"%"<<endl;
-
-    //punto 2 simulo l'inesistenza i alcuni errori 
-    capacity_simulated.clear();
-    capacity_simulated.shrink_to_fit();
-    a.setErrorResistance(0);
-    for(int i =0;i<10000;i++){
-        a.esegui();
-        capacity_simulated.push_back(a.getCapacity_simulated());
-    };
-    error_compound=deviazione_std(capacity_simulated);
-    error_percent=(error_compound/a.getCapacity());
-    cout<<"con un errore pari al " <<error_compound<<"F il valore del errore percentuale è "<<error_percent*100<<"%"<<" ponendo nullo il valore del errore sulla resistenza"<<endl;
-    //
-
-    capacity_simulated.clear();
-    capacity_simulated.shrink_to_fit();
-    a.setErrorResistance(3.);
-    a.setErrorTime(0);
-    for(int i =0;i<10000;i++){
-        a.esegui();
-        capacity_simulated.push_back(a.getCapacity_simulated());
-    };
-    error_compound=deviazione_std(capacity_simulated);
-    error_percent=(error_compound/a.getCapacity());
-    cout<<"con un errore pari al " <<error_compound<<"F il valore del errore percentuale è "<<error_percent*100<<"%"<<" ponendo nullo il valore del errore sul tempo"<<endl;
-    //
-    capacity_simulated.clear();
-    capacity_simulated.shrink_to_fit();
-    a.setErrorVoltageMax(0);
-    a.setErrorTime(3.);
-    for(int i =0;i<10000;i++){
-        a.esegui();
-        capacity_simulated.push_back(a.getCapacity_simulated());
-    };
-    error_compound=deviazione_std(capacity_simulated);
-    error_percent=(error_compound/a.getCapacity());
-    cout<<"con un errore pari al " <<error_compound<<"F il valore del errore percentuale è "<<error_percent*100<<"%"<<" ponendo nullo il valore del errore sul voltaggio massimo"<<endl;
-    //
-    capacity_simulated.clear();
-    capacity_simulated.shrink_to_fit();
-    a.setErrorVoltageMax(3.);
-    a.setErrorVoltageMin(0);
-    for(int i =0;i<10000;i++){
-        a.esegui();
-        capacity_simulated.push_back(a.getCapacity_simulated());
-    };
-    error_compound=deviazione_std(capacity_simulated);
-    error_percent=(error_compound/a.getCapacity());
-    cout<<"con un errore pari al " <<error_compound<<"F il valore del errore percentuale è "<<error_percent*100<<"%"<<" ponendo nullo il valore del errore sul sul voltaggio minimo"<<endl;
-    //punto 3
+    double max_min =0.1;
+    int punti_a_lato=100;
+    double D=100*pow(10,-6);
+    double lambda=500*pow(10,-9);
+    double l=1.;
+    F_integrale aborto(0.000001,D,lambda,l);
+    double passo=0.1/punti_a_lato;
+    // 
     TGraph campo;
     TCanvas c("campo","campo");
     c.SetGridx();
     c.SetGridy();
-    for(int k=0;k<11;k++){
-        capacity_simulated.clear();
-        capacity_simulated.shrink_to_fit();
-        a.setErrorVoltageMax((k/2.)+2);
-        a.setErrorVoltageMin((k/2.)+2);
-        for(int i =0;i<10000;i++){
-            a.esegui();
-            capacity_simulated.push_back(a.getCapacity_simulated());
-        };
-        error_compound=deviazione_std(capacity_simulated);
-        error_percent=(error_compound/a.getCapacity());
-        campo.SetPoint(k,(k/2.)+2,error_percent*100);
 
+    for(int i =0;i<punti_a_lato*2;i++){
+        double appoggio =(-max_min+(passo*i));
+        campo.SetPoint(i,appoggio,aborto.val(appoggio));
     };
-    // Crea una funzione lineare ("pol1" indica un polinomio di primo grado)
-    TF1 *f1 = new TF1("f1", "pol1", campo.GetXaxis()->GetXmin(), campo.GetXaxis()->GetXmax());
+    //rooba di root
+        campo.Draw("AP");
+        campo.SetMarkerStyle(20);
+        campo.SetMarkerSize(1);
+        campo.SetTitle("traiettoria");
+        campo.GetXaxis()->SetTitle("x[m]"); 
+        campo.GetYaxis()->SetTitle("A[m]");
 
-    // Effettua la fit sul grafico
-    campo.Fit(f1, "R");  // "R" indica che si usa l'intervallo specificato
- 
-    // Estrai i parametri della retta
-    double interceptor = f1->GetParameter(0);  // intercetta
-    double Dark_side     = f1->GetParameter(1);  // pendenza
- 
-    std::cout << "Intercetta: " << interceptor << std::endl;
-    std::cout << "Pendenza: " << Dark_side << std::endl;
-    campo.Draw("AP");
-    campo.SetMarkerStyle(20);
-    campo.SetMarkerSize(1);
-    campo.SetTitle("traiettoria");
-    campo.GetXaxis()->SetTitle("v_err[%]"); 
-    campo.GetYaxis()->SetTitle("c_err[%]");
-    c.SaveAs("correlazione.pdf");
-    //punto 4
-    double kenobi=0.;
-    double anakin=7.;
-    kenobi=(anakin-interceptor)/Dark_side;
-    cout<<"per ottenere "<<anakin <<" devo avere un errore di v pari ad "<<kenobi <<endl;
-
+        c.SaveAs("traiettoria.pdf");
+    //punto 2
+    bisezione solutore(1*pow(10,-6));
+    double bisezionato=solutore.cercazeri(0.0,0.05,aborto);
+    cout <<"il vlaore di ampiezza minima è "<<bisezionato<<" con una lungheza d'onda pari a "<<lambda<<endl;
+    // punto 3 
+    aborto.anakin.set_lambda(400*pow(10,-9));
+    bisezionato=solutore.cercazeri(0.0,0.05,aborto);
+    cout <<"il vlaore di ampiezza minima è "<<bisezionato<<" per una lunghezza d'onda "<<400*pow(10,-9) <<endl;
+    aborto.anakin.set_lambda(450*pow(10,-9));
+    bisezionato=solutore.cercazeri(0.0,0.05,aborto);
+    cout <<"il vlaore di ampiezza minima è "<<bisezionato<<" per una lunghezza d'onda "<<450*pow(10,-9) <<endl;
 
 
 

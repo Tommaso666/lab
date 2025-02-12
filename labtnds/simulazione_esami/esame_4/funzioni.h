@@ -186,4 +186,25 @@ class fratta :public Funzione{
         return (1./sqrt(4-(x*x)));
     }
 };
+// Classe per l'integranda
+class integranda : public Funzione {
+    public:
+        integranda(double lambda, double L,double d) : m_lambda(lambda), m_L(L), m_x(0),m_d(d) {}  // Inizializza m_x
+    
+        double val(double t) const override {
+            double app=(1./m_d)*cos((1./m_lambda)*(sqrt((m_L*m_L)+pow(m_x-t,2.))-sqrt((m_L*m_L)+(m_x*m_x))));
+            
+            return app;
+        }
+    
+        void set_x(double x) const { m_x = x; };  // Setter per x
+        double getD()const {return m_d;};
+        void set_lambda(double lambda) { m_lambda = lambda ; };
+    private:
+        double m_lambda, m_L, m_d;
+        //grazie sign. serraino
+        mutable double m_x;
+    };
+    
+
 #endif // __FUNZIONI__

@@ -211,7 +211,7 @@ class trapezi : public integratore {
         } while (errore > err);
         //superfluo ma se otteniamo un risultato migliore dell'atteso di molto sarebbe interessante saperlo
         seterr(errore);
-        std::cout << "Iterazioni: " << iterazioni << std::endl;
+        //std::cout << "Iterazioni: " << iterazioni << std::endl;
         return risultatoPrecedente;
     };
 
@@ -346,6 +346,22 @@ template <typename T> double deviazione_std(const vector<T> &x)
     z=sqrt(a/x.size());
     return z;
 };
-
+// purtoppo devo iplementare una funzione qua 
+// Classe per calcolare l'integrale
+class F_integrale : public Funzione {
+  public:
+      F_integrale(double err, double D, double lambda, double L)
+          : my_err(err), anakin(lambda, L, D) {;};
+  
+      double val(double x)const override {
+          trapezi a;
+          anakin.set_x(x);
+          return a.integraleErr(anakin, -anakin.getD() / 2.,  anakin.getD()/ 2., my_err);
+      }
+      integranda anakin;
+  private:
+      double my_err;
+      
+  };
 
 #endif //__integratori__
