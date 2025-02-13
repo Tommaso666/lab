@@ -1,0 +1,10 @@
+
+CFLAGS := `root-config --cflags` -fopenmp 
+
+LIBS := `root-config --libs` -fopenmp
+
+main1: main1.cpp funzioni.h vectorop.h differenziare.h random.h funzionivector.h
+	g++ -o main1 main1.cpp ${CFLAGS} ${LIBS}
+
+clean:
+	rm main1

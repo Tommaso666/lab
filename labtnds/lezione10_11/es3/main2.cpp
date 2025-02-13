@@ -6,6 +6,7 @@
 #include <iomanip>
 #include <algorithm>
 #include <omp.h>
+#include<fstream>
 
 #include "TApplication.h"
 #include "TAxis.h"
@@ -15,6 +16,7 @@
 #include "TH1F.h"
 #include "funzioni.h"
 #include "funzionivector.h"
+#include "vectorop.h"
 
 std::string convert ( double h ) ;
 
@@ -22,34 +24,39 @@ int main(){
 // TApplication app("app",0,0);
 
 
-TGraph stdev; 
- seno f(1,1);
- vector<int> cases;
- TCanvas can2("Uniforme","Uniforme") ;
-   int n_max=10000; 
-  double pimez=(M_PI/2);
-  hitmis coso(1);
+    TGraph stdev; 
+    vector<int> cases;
+    TCanvas can2("Uniforme","Uniforme") ;
+    int n_max=10000; 
     vector<TH1F*> vhistos;
     vector<double> devst;
-  int m=100;
-  for(int k=0;k<6;k++){
+    int m=100;
+    for(int k=0;k<6;k++){
     double app =0;
-    if((k+1)%2){app=m*5;}else{app=m*2;};
+    if((k+1)%2){app=m*2;}else{app=m*5;};
     cases.push_back(app);
     m=app;
     };
 
 
-  // #pragma omp parallel for
+
   for ( int k = 0 ; k < cases.size() ; k++ ) {     // ciclo sui casi da studiare
 
     string nomehisto = "h"+to_string(k);
-    cout << "Integro con punti = " << cases[k] << endl;
-    TH1F * h = new TH1F(nomehisto.c_str(),nomehisto.c_str(),100,0.8,1.2) ;                   // costruzione istogramma 
+    string nomefiles = "numeri_a_"+to_string(k)+"_punti.txt";
+    TH1F* h = new TH1F(nomehisto.c_str(),nomehisto.c_str(),100,0.8,1.2) ;                   // costruzione istogramma 
     vector<double> vettoreapp;
- 
+    vector<double> coso;
+    double data =0;
+    ifstream fin(nomefiles.c_str());
+    
+        while(fin>>data){
+           
+            coso.push_back(data);
+            if (fin.eof());
+        };
     for ( int j = 0 ; j < n_max ; j++ ){ 
-      double appoggio=coso.Integra(f,0,pimez,cases[k],0.5);
+      double appoggio=coso[j];
         
       h->Fill((appoggio)) ; // riempimento istogramma
 
@@ -102,7 +109,7 @@ TGraph stdev;
 return 0;
 
 
-}
+};
 std::string convert ( double h ) {
 
   int cifre_significative = -log10(h);
